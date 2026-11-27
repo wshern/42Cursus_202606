@@ -5,3 +5,4 @@
 a.out
 libft_tester/
 .vscode/
+.mypy_cache/

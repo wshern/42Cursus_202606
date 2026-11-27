@@ -53,35 +53,35 @@ class Plant:
         else:
             self._grow_rate = grow_rate
 
-        if age_rate < 1:
-            {f"{name.capitalize()}: Error, aging can't be negative"}
+        if age_rate < 0:
+            print(f"{name.capitalize()}: Error, aging can't be negative")
             self._age_rate = 1
         else:
             self._age_rate = age_rate
 
         # initiate the nested class
-        self._Stats() = Plant._Stats
+        self._stats = Plant._Stats()
 
     @classmethod
     def unknown_plant(cls) -> "Plant":
-        return cls("Unknown plant", 0.0, 0, 0)
+        return cls("Unknown plant", 0.0, 0, 0.0, 0)
 
     def show(self) -> None:
         print(f"{self._name.capitalize()}:", end=" ")
         print(f"{round(self._height, 1)}cm, {self._days} days old")
-        Plant._Stats.add_show()
+        self._stats.add_show()
 
     def showstats(self) -> None:
-        print(f"[statistics for {self._name}]")
-        Plant._Stats.display()
+        print(f"[statistics for {self._name.capitalize()}]")
+        self._stats.display()
 
     def grow(self) -> None:
         self._height += self._grow_rate
-        Plant._Stats.add_grow()
+        self._stats.add_grow()
 
     def age(self) -> None:
-        self._days += 1
-        Plant._Stats.add_age()
+        self._days += self._age_rate
+        self._stats.add_age()
 
     def sim_growth(self) -> None:
         self.grow()
@@ -128,7 +128,6 @@ class Flower(Plant):
         self._isbloom = False
 
     def bloom(self) -> None:
-        print(f"[asking the {self._name} to bloom]")
         self._isbloom = True
 
     def show(self) -> None:
@@ -164,11 +163,10 @@ class Tree(Plant):
     ) -> None:
         super().__init__(name, height, days, grow_rate, age_rate)
         self._trunk_diameter = trunk_diameter
-        # self._TreeStats = Tree._TreeStats
+        # self._treestats = Tree._TreeStats
         self._shade_ctr = 0
 
     def produce_shade(self) -> None:
-        print(f"[asking the {self._name} to produce shade]")
         print(f"Tree {self._name.capitalize()} now produces a shade of "
               f"{self._height}cm long and {self._trunk_diameter}cm wide.")
         self._shade_ctr += 1
@@ -180,6 +178,7 @@ class Tree(Plant):
     def showstats(self) -> None:
         super().showstats()
         print(f"{self._shade_ctr} shade")
+
 
 class Vegetable(Plant):
     def __init__(
@@ -233,8 +232,8 @@ class Seed(Flower):
         self._seed_add = seed_add
 
     def bloom(self) -> None:
-        print(f"make {self._name} grow, age and bloom")
         self._seed_qty += self._seed_add
+        super().bloom()
 
     def show(self) -> None:
         super().show()
@@ -245,30 +244,45 @@ def plant_stats(plant: Plant) -> None:
     plant.showstats()
 
 
-
-
-
-
-
-
 def main() -> None:
-    print("=== Garden Plant Types ===")
+    print("=== Garden statistics ===\n"
+          "=== Check year-old")
+    print(f"Is 30 days more than a year? -> {Plant.check_age(30)}")
+    print(f"Is 400 days more than a year? -> {Plant.check_age(400)}\n")
+
     print("=== Flower")
-    rose = Plant("rose", 15.0, 10, 0)
+    rose = Flower("rose", 15.0, 10, 8.0, 0, "red")
     rose.show()
+    plant_stats(rose)
+    print("[asking the rose to grow and bloom]")
+    rose.bloom()
+    rose.grow()
     rose.show()
+    plant_stats(rose)
     print()
 
-    # print("=== Tree")
-    # oak = Tree("oak", 200.0, 365, 0.0, 5.0)
-    # oak.show()
-    # oak.produce_shade()
-    # print()
+    print("=== Tree")
+    oak = Tree("oak", 200.0, 365, 0.0, 0, 5.0)
+    oak.show()
+    plant_stats(oak)
+    print("[asking the oak to produce shade]")
+    oak.produce_shade()
+    plant_stats(oak)
+    print()
 
-    # print("=== Vegetable")
-    # tomato = Vegetable('tomato', 5.0, 10, 2.1, "April", 0, 20)
-    # tomato.show()
-    # tomato.sim_growth()
+    print("=== Seed")
+    sunflower = Seed("sunflower", 80.0, 45, 30.0, 20, "yellow", 0, 42)
+    sunflower.show()
+    print("[make sunflower grow, age and bloom]")
+    sunflower.bloom()
+    sunflower.sim_growth()
+    plant_stats(sunflower)
+    print()
+
+    print("=== Anonymous")
+    unknown = Plant.unknown_plant()
+    unknown.show()
+    plant_stats(unknown)
 
 
 if __name__ == "__main__":
